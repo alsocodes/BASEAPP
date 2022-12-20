@@ -1,11 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
-import {
-  listCabang,
-  listGroupAkses,
-  listPegawai,
-  listProgram,
-} from './data.seed';
+import * as bcrypt from 'bcrypt';
+
+import { listCabang, listGroupAkses, listPegawai, listProgram } from './data.seed';
 async function main() {
   for (let i in listCabang) {
     const { kode, nama, alamat } = listCabang[i];
@@ -41,7 +38,7 @@ async function main() {
     });
 
     for (let x in listAkses) {
-      const akses = `${kode}_${listAkses[x]}`;
+      const akses = `${listAkses[x]}`;
       await prisma.akses.upsert({
         where: { akses },
         update: {},
@@ -101,6 +98,38 @@ async function main() {
         jabatan,
         cabangId,
         kode,
+      },
+    });
+
+    const {
+      passwordPlain,
+      saltRound,
+      email: userEmail,
+      groupAksesId,
+      listAkses,
+      listProgram,
+      username,
+    } = user;
+    const salt = await bcrypt.genSalt(saltRound);
+    const password = await bcrypt.hash(passwordPlain, salt);
+    await prisma.user.upsert({
+      where: { pegawaiId: pegawai.id },
+      update: {
+        email: userEmail,
+        username,
+        password,
+        groupAksesId,
+        listAkses,
+        listProgram,
+      },
+      create: {
+        email,
+        username,
+        password,
+        listAkses,
+        listProgram,
+        groupAksesId,
+        pegawaiId: pegawai.id,
       },
     });
   }

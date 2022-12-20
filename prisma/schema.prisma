@@ -17,15 +17,24 @@ model User {
   pegawaiId    Int        @unique
   groupAkses   GroupAkses @relation(fields: [groupAksesId], references: [id])
   groupAksesId Int
-  listAccess   String[]
+  listAkses    String[]
   listProgram  String[]
   email        String     @unique @db.VarChar(100)
   username     String     @unique @db.VarChar(20)
   password     String?
   salt         String?
+  refreshToken String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   deletedAt    DateTime?
+}
+
+model AuthLog {
+  id     Int      @id @default(autoincrement())
+  userId Int?
+  ip     String?
+  status Boolean  @default(false)
+  time   DateTime @default(now())
 }
 
 model Pegawai {
@@ -87,7 +96,7 @@ model Akses {
 model GroupAkses {
   id         Int       @id @default(autoincrement())
   publicId   String    @default(uuid())
-  nama       String    @db.VarChar(30) @unique
+  nama       String    @unique @db.VarChar(30)
   keterangan String    @db.VarChar(255)
   listAkses  String[]
   createdAt  DateTime  @default(now())
