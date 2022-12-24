@@ -16,7 +16,7 @@ export class AccessGuard implements CanActivate {
       return true;
     }
     const { user } = context.switchToHttp().getRequest();
-    console.log(user);
+    // console.log(user);
     return requiredAccess.some((access) => user.accesses?.includes(access));
   }
 }

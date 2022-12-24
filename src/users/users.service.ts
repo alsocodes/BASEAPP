@@ -28,6 +28,13 @@ export class UsersService {
     });
   }
 
+  async removeRefreshToken(publicId: string) {
+    return this.prisma.user.update({
+      where: { publicId: publicId },
+      data: { refreshToken: null },
+    });
+  }
+
   async updateRefreshToken(id: number, refreshToken: string) {
     return this.prisma.user.update({
       where: { id: id },

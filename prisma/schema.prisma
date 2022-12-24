@@ -12,7 +12,7 @@ datasource db {
 
 model User {
   id           Int        @id @default(autoincrement())
-  publicId     String     @default(uuid())
+  publicId     String     @unique @default(uuid())
   pegawai      Pegawai    @relation(fields: [pegawaiId], references: [id])
   pegawaiId    Int        @unique
   groupAkses   GroupAkses @relation(fields: [groupAksesId], references: [id])

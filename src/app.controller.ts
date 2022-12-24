@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
 import { PublicRoute } from './auth/constants';
@@ -35,7 +35,17 @@ export class AppController {
   async refreshLogin(@Request() req) {
     const { userId, refreshToken } = req.user;
     // return refreshToken;
-    return this.authService.refreshLogin(userId, refreshToken);
+    const result = await this.authService.refreshLogin(userId, refreshToken);
+    return {
+      statusCode: 200,
+      message: 'Refresh Login Berhasil',
+      result,
+    };
+  }
+
+  @Delete('auth/logout')
+  async logout(@Request() req) {
+    return this.authService.logout(req.user.userId);
   }
 
   @Get('profile')

@@ -90,7 +90,7 @@ export class AuthService {
     const tokens = await this.generateToken({
       username: user.username,
       sub: user.publicId,
-      roles: [...user.listAkses, ...user.groupAkses?.listAkses],
+      accesses: [...user.listAkses, ...user.groupAkses?.listAkses],
     });
 
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken);
@@ -101,8 +101,12 @@ export class AuthService {
         id: user.publicId,
         username: user.username,
         name: user.pegawai.nama,
-        roles: [...user.listAkses, ...user.groupAkses?.listAkses],
+        accesses: [...user.listAkses, ...user.groupAkses?.listAkses],
       },
     };
+  }
+
+  async logout(publicId: string) {
+    return this.usersService.removeRefreshToken(publicId);
   }
 }
