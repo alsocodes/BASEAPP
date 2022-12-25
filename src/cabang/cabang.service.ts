@@ -38,9 +38,9 @@ export class CabangService {
     };
   }
 
-  async findByKode(kode: string) {
-    return this.prisma.cabang.findFirst({ where: { kode: kode } });
-  }
+  // async findByKode(kode: string) {
+  //   return this.prisma.cabang.findFirst({ where: { kode: kode } });
+  // }
 
   async findById(publicId: string) {
     return this.prisma.cabang.findFirst({ where: { publicId: publicId } });
@@ -48,15 +48,20 @@ export class CabangService {
 
   async create(data: CreateCabangDto) {
     try {
-      const conflict = await this.findByKode(data.kode);
+      const conflict = await this.prisma.cabang.findMany({
+        where: {
+          OR: [{ kode: data.kode }, { nama: data.nama }],
+        },
+      });
       if (conflict) {
-        throw new ConflictException('Kode telah digunakan');
+        throw new ConflictException('Kode atau Nama telah digunakan');
       }
 
       await this.prisma.cabang.create({
         data: data,
       });
     } catch (error) {
+      // console.log('here ', error.message);
       throw error;
     }
   }
@@ -67,10 +72,10 @@ export class CabangService {
       const exist = await this.findById(publicId);
       if (!exist) throw new NotFoundException('Cabang tidak ditemukan');
 
-      const conflict = await this.findByKode(data.kode);
-      if (conflict && conflict.publicId !== publicId) {
-        throw new ConflictException('Kode telah digunakan');
-      }
+      // const conflict = await this.findByKode(data.kode);
+      // if (conflict && conflict.publicId !== publicId) {
+      //   throw new ConflictException('Kode telah digunakan');
+      // }
 
       await this.prisma.cabang.update({
         where: {
