@@ -7,7 +7,7 @@ import { PrismaClient } from '@prisma/client';
 export class PrismaService extends PrismaClient {
   constructor() {
     super();
-    this.$use(SoftDeleteMiddleware);
+    // this.$use(SoftDeleteMiddleware);
   }
   async enableShutdownHooks(app: INestApplication) {
     this.$on('beforeExit', async () => {

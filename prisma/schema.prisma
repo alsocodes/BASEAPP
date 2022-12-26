@@ -61,8 +61,8 @@ model Pegawai {
 model Cabang {
   id        Int       @id @default(autoincrement())
   publicId  String    @unique @default(uuid())
-  kode      String    @db.VarChar(3)
-  nama      String    @db.VarChar(100)
+  kode      String    @unique @db.VarChar(3)
+  nama      String    @unique @db.VarChar(100)
   alamat    String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

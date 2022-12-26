@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,9 +10,9 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { Access } from 'prisma/access.enum';
 import { CanAccess } from 'src/auth/access.decorator';
+import { ContstraintsException } from 'src/utils/constraints-exception';
 import { CabangService } from './cabang.service';
 import { CreateCabangDto } from './dto/create-cabang.dto';
 import { GetCabangDto } from './dto/get-cabang.dto';
@@ -34,20 +35,22 @@ export class CabangController {
   @Post()
   @CanAccess(Access.BASEAPP_CABANG_CREATE)
   async create(@Body() createCabangDto: CreateCabangDto) {
-    await this.cabangService.create(createCabangDto);
+    const publicId = await this.cabangService.create(createCabangDto);
     return {
       statusCode: 201,
       message: 'Cabang berhasil dibuat',
+      publicId: publicId,
     };
   }
 
   @Put('/:id')
   @CanAccess(Access.BASEAPP_CABANG_UPDATE)
   async update(@Body() updateCabangDto: UpdateCabangDto, @Param('id') id: string) {
-    await this.cabangService.update(id, updateCabangDto);
+    const publicId = await this.cabangService.update(id, updateCabangDto);
     return {
       statusCode: 200,
       message: 'Cabang berhasil diupdate',
+      publicId,
     };
   }
 
@@ -67,10 +70,16 @@ export class CabangController {
   @Delete('/:id')
   @CanAccess(Access.BASEAPP_CABANG_DELETE)
   async delete(@Param('id') publicId: string) {
-    await this.cabangService.delete(publicId);
-    return {
-      statusCode: 200,
-      message: 'Cabang berhasil dihapus',
-    };
+    try {
+      await this.cabangService.delete(publicId);
+      return {
+        statusCode: 200,
+        message: 'Cabang berhasil dihapus',
+      };
+    } catch (error) {
+      // console.log(error.code);
+      if (error.code === 'P2003') throw new ContstraintsException();
+      throw new BadRequestException();
+    }
   }
 }
